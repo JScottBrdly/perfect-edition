@@ -29,6 +29,11 @@ book_data = YAML.load(File.read("source/book.yaml"))
 
 book_data["modified_date"] = DateTime.now.strftime("%Y-%m-%dT%H:%M:%SZ")
 book_data["guid"] = SecureRandom.alphanumeric(12)
+
+unless book_data["home_url"][-1] == "/"
+  book_data["home_url"] += "/"
+end
+
 slug = book_data["slug"] # for convenience, because we will use it many times
 
 # Build directory setup
@@ -91,6 +96,7 @@ epub_book = book.clone
 # This variable holds the "logical TOC" we pull out of the markdown
 
 toc_items = []
+toc_duplicate_tracker = {}
 
 # (Personally, I like treating the markdown as the "source of truth" and
 # generating everything else from it.)
@@ -98,6 +104,24 @@ toc_items = []
 book.css("h2").each do |heading|
   # This is a version of the title suitable for use in an anchor tag:
   href_title = heading.inner_html.gsub(/\W/, "_").downcase
+
+  if toc_duplicate_tracker[href_title]
+    toc_duplicate_tracker[href_title] += 1
+    href_title += "_#{toc_duplicate_tracker[href_title].to_s}"
+  else
+    toc_duplicate_tracker[href_title] = 1
+  end
+
+  # If the href has already been seen, add a count to the end
+=begin
+  if toc_items.collect { |item| item[:href_title] }.include? href_title
+    puts "dup!"
+    dups = toc_items.find_all do |item|
+      item[:href_title].start_with? href_title
+    end
+    href_title = "#{href_title}-#{dups.length}"
+  end
+=end
 
   toc_items << {:title => heading.inner_html, :href_title => href_title}
 
@@ -130,7 +154,7 @@ web_book_full_template = Liquid::Template.parse(File.read("source/_web-template/
 
 web_book_full_html = normalize_html( web_book_full_template.render( book_data ) )
 
-File.write("#{web_book_build_path}/web-book.html", web_book_full_html)
+File.write("#{web_book_build_path}/index.html", web_book_full_html)
 
 # And finally, copy the static / uncompiled files
 
