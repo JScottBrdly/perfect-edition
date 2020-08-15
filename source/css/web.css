@@ -28,6 +28,20 @@
   src: url("../font/Vollkorn-SemiboldItalic.woff2") format("woff2");
 }
 
+@font-face {
+  font-family: "Lora";
+  font-weight: 500;
+  font-style: normal;
+  src: url("../font/lora-v16-latin-500.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Lora";
+  font-weight: 500;
+  font-style: italic;
+  src: url("../font/lora-v16-latin-500itallic.woff2") format("woff2");
+}
+
 *, *:before, *:after {
   box-sizing: border-box;
   text-rendering: optimizelegibility;
@@ -343,14 +357,15 @@ h2 {
   padding: 0;
   line-height: calc( var(--line-height) * 2.0 );
   font-size: 1.5rem;
+  font-family: Lora;
   font-weight: 500;
-  font-style: italic;
+  font-style: normal;
   column-break-before: always;
   break-before: column;
 }
 
 a, a:link, a:visited {
-  color: var(--spot-color);
+  color: var(--spot-color); text-decoration: none;
 }
 
 a:hover, a:active {
